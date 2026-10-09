@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0f172a">
+  <meta name="description" content="Editor open source de HTML5 e CSS3 com preview instantâneo, offline e PWA.">
+  <title>OpenHTML Studio</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/favicon.ico" sizes="any">
+  <link rel="icon" href="icons/icon-32.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="icons/icon-180.png" sizes="180x180">
+  <link rel="stylesheet" href="css/app.css?v=1.0.2">
+</head>
+<body data-theme="dark">
+  <a class="skip-link" href="#editorRegion">Pular para o editor</a>
+
+  <header class="app-header" role="banner">
+    <a class="brand" href="./" aria-label="OpenHTML Studio — início" title="OpenHTML Studio">
+      <img
+        class="brand-logo"
+        src="assets/openhtml-studio-logo.png"
+        alt="OpenHTML Studio"
+        width="720"
+        height="240"
+      >
+      <img
+        class="brand-icon"
+        src="icons/icon-64.png"
+        alt=""
+        width="64"
+        height="64"
+        aria-hidden="true"
+      >
+      <span class="brand-mobile-text">OpenHTML Studio</span>
+    </a>
+
+    <div class="toolbar" role="toolbar" aria-label="Ferramentas principais">
+      <button class="icon-btn" id="newProjectBtn" title="Novo projeto" aria-label="Novo projeto">＋</button>
+      <button class="icon-btn" id="saveBtn" title="Salvar localmente (Ctrl+S)" aria-label="Salvar localmente">💾</button>
+      <button class="icon-btn" id="importBtn" title="Importar HTML ou CSS" aria-label="Importar arquivos">📂</button>
+      <button class="icon-btn" id="exportBtn" title="Exportar projeto" aria-label="Exportar projeto">⬇</button>
+      <button class="icon-btn" id="shareBtn" title="Compartilhar pelo hash da URL" aria-label="Compartilhar projeto">🔗</button>
+      <span class="toolbar-separator" aria-hidden="true"></span>
+      <button class="icon-btn" id="formatBtn" title="Formatar código" aria-label="Formatar código">≡</button>
+      <button class="icon-btn" id="minifyBtn" title="Minificar CSS" aria-label="Minificar CSS">⚡</button>
+      <button class="icon-btn" id="validateBtn" title="Validar HTML e CSS" aria-label="Validar código">✓</button>
+      <button class="icon-btn" id="w3cBtn" title="Validar HTML no W3C (requer internet)" aria-label="Validar HTML no W3C">W3C</button>
+      <span class="toolbar-separator" aria-hidden="true"></span>
+      <button class="icon-btn" id="themeBtn" title="Alternar tema claro/escuro" aria-label="Alternar tema">☾</button>
+      <button class="icon-btn install-btn" id="installBtn" title="Instalar como aplicativo" aria-label="Instalar aplicativo" hidden>Instalar</button>
+    </div>
+  </header>
+
+  <main class="app-shell">
+    <section class="workspace-controls" aria-label="Controles da área de trabalho">
+      <div class="mobile-panels" role="tablist" aria-label="Painel visível">
+        <button class="panel-tab is-active" data-panel="editor" role="tab" aria-selected="true">Editor</button>
+        <button class="panel-tab" data-panel="preview" role="tab" aria-selected="false">Preview</button>
+        <button class="panel-tab" data-panel="console" role="tab" aria-selected="false">Console</button>
+      </div>
+      <div class="status-actions">
+        <span id="saveStatus" class="status-pill" aria-live="polite">Pronto</span>
+        <button class="text-btn" id="refreshBtn" title="Atualizar preview (Ctrl+Enter)">Atualizar preview</button>
+      </div>
+    </section>
+
+    <section class="workspace" id="workspace">
+      <section class="pane editor-pane is-visible" id="editorRegion" aria-label="Editor de código">
+        <div class="tabs" role="tablist" aria-label="Arquivos">
+          <button class="file-tab is-active" data-language="html" role="tab" aria-selected="true">index.html</button>
+          <button class="file-tab" data-language="css" role="tab" aria-selected="false">styles.css</button>
+        </div>
+
+        <div class="editor-actions">
+          <span id="languageBadge" class="language-badge">HTML5</span>
+          <span class="shortcut-hint">Ctrl+Espaço: autocomplete • Tab: Emmet • Ctrl+/: comentar</span>
+        </div>
+
+        <div class="editor-host" id="editorHost">
+          <div class="line-numbers" id="lineNumbers" aria-hidden="true">1</div>
+          <div class="editor-stack">
+            <pre class="highlight-layer" id="highlightLayer" aria-hidden="true"><code></code></pre>
+            <textarea
+              id="codeEditor"
+              class="code-editor"
+              aria-label="Editor HTML"
+              spellcheck="false"
+              autocapitalize="off"
+              autocomplete="off"
+              autocorrect="off"
+              wrap="off"
+            ></textarea>
+            <div class="autocomplete" id="autocomplete" role="listbox" aria-label="Sugestões" hidden></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="pane preview-pane" id="previewRegion" aria-label="Preview">
+        <div class="preview-toolbar">
+          <div class="device-buttons" role="group" aria-label="Emulação de dispositivo">
+            <button class="device-btn" data-device="mobile" title="Mobile 390px">📱</button>
+            <button class="device-btn" data-device="tablet" title="Tablet 768px">▣</button>
+            <button class="device-btn is-active" data-device="desktop" title="Desktop responsivo">🖥</button>
+          </div>
+          <label class="toggle-label">
+            <input type="checkbox" id="gridToggle">
+            <span>Grade</span>
+          </label>
+          <span id="previewSize" class="preview-size" aria-live="polite">Desktop</span>
+        </div>
+        <div class="preview-stage" id="previewStage">
+          <div class="ruler" aria-hidden="true"></div>
+          <div class="device-frame device-desktop" id="deviceFrame">
+            <div class="grid-overlay" id="gridOverlay" hidden aria-hidden="true"></div>
+            <iframe
+              id="previewFrame"
+              title="Preview do projeto"
+              sandbox="allow-scripts allow-forms allow-modals allow-popups"
+              referrerpolicy="no-referrer"
+            ></iframe>
+          </div>
+        </div>
+      </section>
+
+      <section class="pane console-pane" id="consoleRegion" aria-label="Console e validação">
+        <div class="console-header">
+          <div class="console-tabs" role="tablist" aria-label="Console">
+            <button class="console-tab is-active" data-console-tab="runtime" role="tab" aria-selected="true">Console</button>
+            <button class="console-tab" data-console-tab="validation" role="tab" aria-selected="false">Validação</button>
+          </div>
+          <button class="text-btn danger" id="clearConsoleBtn">Limpar</button>
+        </div>
+        <div id="runtimeConsole" class="console-output" role="log" aria-live="polite"></div>
+        <div id="validationConsole" class="console-output" role="log" aria-live="polite" hidden></div>
+      </section>
+    </section>
+  </main>
+
+  <input type="file" id="fileInput" accept=".html,.htm,.css,text/html,text/css" multiple hidden>
+
+  <div class="modal-backdrop" id="exportModal" aria-hidden="true" hidden>
+    <section class="modal" role="dialog" aria-modal="true" aria-labelledby="exportTitle">
+      <div class="modal-header">
+        <h2 id="exportTitle">Exportar projeto</h2>
+        <button class="icon-btn" data-close-modal aria-label="Fechar">×</button>
+      </div>
+      <div class="modal-body">
+        <button class="export-card" id="exportSingleBtn">
+          <strong>Arquivo único</strong>
+          <span>Baixa index.html com o CSS embutido.</span>
+        </button>
+        <button class="export-card" id="exportSeparateBtn">
+          <strong>Arquivos separados</strong>
+          <span>Baixa index.html e styles.css.</span>
+        </button>
+      </div>
+    </section>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+  <script type="module" src="js/app.js?v=1.0.2"></script>
+</body>
+</html>
